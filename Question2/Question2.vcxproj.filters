@@ -24,10 +24,7 @@
     <ClCompile Include="data.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="seats.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utility.c">
+    <ClCompile Include="airline.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,10 +35,7 @@
     <ClInclude Include="data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="seats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility.h">
+    <ClInclude Include="airline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
