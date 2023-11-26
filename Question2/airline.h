@@ -20,11 +20,11 @@
 // Define a seat node
 typedef struct SeatNode {
     int seatID;
+    int flightNumber;  // Added a flightNumber field
     bool assigned;
     char firstName[MAX_NAME_LENGTH];
     char lastName[MAX_NAME_LENGTH];
-    // Pointer to the next seat in the linked list
-    struct SeatNode* next; 
+    struct SeatNode* next;
 } SEATNODE;
 
 // Define a linked list of seats for a plane
@@ -46,7 +46,7 @@ extern PLANE Planes[NUM_PLANES];
 extern int flightNumbers[NUM_FLIGHTS]; 
 
 // Function prototypes
-void initializeSeats(SEATLIST* seatList);
+void initializeSeats(SEATLIST* seatList, int flightNumber);  
 
 void show_empty_seats(SEATLIST* seatList);
 
@@ -54,8 +54,10 @@ void show_list_of_empty_seats(SEATLIST* seatList);
 
 void delete_seat_assignment(SEATLIST* seatList);
 
-void assign_customer_to_seat(SEATLIST* seatList);
+void assign_customer_to_seat(SEATLIST* seatList); 
 
 void show_alphabetical_list_of_seats(SEATLIST* seatList);
+
+void confirm_seat_assignment(SEATLIST* seatList, int flightNumber);   
 
 void clearInputBuffer(); 

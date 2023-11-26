@@ -11,16 +11,28 @@
 #define _CRT_SECURE_NO_WARNINGS   
 
 #include "menu.h"
+
 #include <stdio.h>
 
-void airlineMenu()
+void airlineFlightMenu()
 {
-	//print menu
-	printf("** Welcome to Colossus Airlines **\n");   
-	printf("a) Show number of empty seats\n");
-	printf("b) Show list of empty seats\n");
-	printf("c) Show alphabetical list of seats\n");
-	printf("d) Assign a customer to a seat assignment\n");
-	printf("e) Delete a seat assignment\n");
-	printf("f) Quit\n");
+    printf("\nTop-Level Menu\n");
+    printf("1. Flight 102\n");
+    printf("2. Flight 311\n");
+    printf("3. Flight 444\n");
+    printf("4. Flight 519\n");
+    printf("0. Quit\n");
+    printf("Enter your choice: ");
+}
+
+void generalSeatMenu()
+{  
+    printf("a. Show the number of empty seats\n");
+    printf("b. Show a list of empty seats\n");
+    printf("c. Show an alphabetical list of seats\n");
+    printf("d. Assign a customer to a seat\n");
+    printf("e. Delete a seat assignment\n");
+    printf("f. Confirm Seat Assignment\n"); // Moved this line to the sub-menu
+    printf("g. Return to top-level menu\n");
+    printf("Enter your choice: ");
 }

@@ -10,4 +10,5 @@
 *
 */
 
-void airlineMenu();
+void airlineFlightMenu();
+void generalSeatMenu(); 

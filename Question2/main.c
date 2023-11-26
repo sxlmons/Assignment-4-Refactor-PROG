@@ -57,75 +57,101 @@ o Documentation: 4.0/4.0
 #include <ctype.h>
 
 #include "menu.h"
-//#include "data.h"
-//#include "seats.h"
-//#include "utility.h"
 #include "airline.h"
 
 
 
 int main(void) {
     // Initialize the seats array for both planes
-    initializeSeats(&Planes[0].seats);
-    initializeSeats(&Planes[1].seats);
+    initializeSeats(&Planes[0].seats, flightNumbers[0]);
+    initializeSeats(&Planes[1].seats, flightNumbers[1]);
 
     // Variable to store the user's menu choice
     char choice;
     int planeNumber;
+    int flightNumber;
 
     // Main loop of the program
     do {
-        printf("Enter plane number (1 or 2, 0 to exit): ");
-        scanf_s("%d", &planeNumber);
+        // Print top-level menu
+        airlineFlightMenu();  
 
-        if (planeNumber >= 1 && planeNumber <= NUM_PLANES) 
-        {
-            PLANE* plane = &Planes[planeNumber - 1];
+        // Get user's choice
+        scanf_s(" %c", &choice, 1);
+        getchar(); // eat newline
 
-            // Print menu
-            airlineMenu();
+        switch (choice) {
+        case '1':
+            planeNumber = 1;
+            flightNumber = flightNumbers[0];   
+            break;
+        case '2':
+            planeNumber = 2;
+            flightNumber = flightNumbers[1];
+            break;
+        case '3':
+            planeNumber = 1; // Assuming you want to use the same planes for multiple flights
+            flightNumber = flightNumbers[2];
+            break;
+        case '4':
+            planeNumber = 2; // Assuming you want to use the same planes for multiple flights
+            flightNumber = flightNumbers[3];
+            break;
+        case '0':
+            printf("Exiting the program. Goodbye!\n");
+            return 0;
+        default:
+            printf("Invalid choice. Please try again.\n");
+            continue;
+        }
 
-            // Menu selection variable
-            scanf_s(" %c", &choice, INPUT_LENGTH);
-            clearInputBuffer();
+        printf("\nYou selected Flight %d.\n", flightNumber);
 
-            switch (tolower(choice)) 
-            {
+        // Sub-menu loop for the chosen flight
+        do {
+            // Print sub-menu heading the chosen flight
+            printf("\nFlight %d Menu\n", flightNumber);
+            generalSeatMenu();
+
+            // Get user's choice for the chosen flight
+            scanf_s(" %c", &choice, 1);
+            getchar(); // eat newline
+
+            switch (choice) {
             case 'a':
-                // Show the number of empty seats
-                show_empty_seats(&plane->seats);
+                // Show the number of empty seats for the chosen flight
+                show_empty_seats(&Planes[planeNumber - 1].seats);
                 break;
             case 'b':
-                // Show a list of empty seats
-                show_list_of_empty_seats(&plane->seats);
+                // Show a list of empty seats for the chosen flight
+                show_list_of_empty_seats(&Planes[planeNumber - 1].seats);
                 break;
             case 'c':
-                // Show an alphabetical list of seats
-                show_alphabetical_list_of_seats(&plane->seats);
+                // Show an alphabetical list of seats for the chosen flight
+                show_alphabetical_list_of_seats(&Planes[planeNumber - 1].seats);
                 break;
             case 'd':
-                // Assign a customer to a seat
-                assign_customer_to_seat(&plane->seats);
+                // Assign a customer to a seat for the chosen flight
+                assign_customer_to_seat(&Planes[planeNumber - 1].seats);
                 break;
             case 'e':
-                // Delete a seat assignment
-                delete_seat_assignment(&plane->seats);
+                // Delete a seat assignment for the chosen flight
+                delete_seat_assignment(&Planes[planeNumber - 1].seats);
                 break;
             case 'f':
-                printf("Exiting plane %d. Program Exit Successful.\n", planeNumber);
+                // Confirm seat assignment for the chosen flight
+                confirm_seat_assignment(&Planes[planeNumber - 1].seats, planeNumber); 
+                break;
+            case 'g':
+                // Return to the top-level menu
+                printf("Returning to the top-level menu.\n");
                 break;
             default:
-                // Handle invalid menu choices
-                printf("Invalid Input.\n");
+                printf("Invalid choice. Please try again.\n");
             }
-        }
-        else if (planeNumber != 0) 
-        {
-            printf("Invalid plane number.\n");
-        }
+        } while (choice != 'g'); // Continue the sub-menu loop until the user chooses to return to the top-level menu
 
-        // End the loop when the user chooses to exit (enters 0)
-    } while (planeNumber != 0);
+    } while (true); // Continue the main loop indefinitely until the user chooses to quit
 
     return 0;
 }
