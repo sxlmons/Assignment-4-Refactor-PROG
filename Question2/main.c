@@ -78,7 +78,7 @@ int main(void) {
 
         // Get user's choice
         scanf_s(" %c", &choice, 1);
-        getchar(); // eat newline
+        (void)getchar(); // eat newline; added void for compiler
 
         switch (choice) {
         case '1':
@@ -120,11 +120,11 @@ int main(void) {
             switch (choice) {
             case 'a':
                 // Show the number of empty seats for the chosen flight
-                show_empty_seats(&Planes[planeNumber - 1].seats);
+                show_empty_seats_by_flight(&Planes[planeNumber - 1].seats, flightNumber); 
                 break;
             case 'b':
                 // Show a list of empty seats for the chosen flight
-                show_list_of_empty_seats(&Planes[planeNumber - 1].seats);
+                show_list_of_empty_seats(&Planes[planeNumber - 1].seats);  
                 break;
             case 'c':
                 // Show an alphabetical list of seats for the chosen flight

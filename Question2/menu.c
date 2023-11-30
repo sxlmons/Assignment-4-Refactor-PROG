@@ -16,13 +16,13 @@
 
 void airlineFlightMenu()
 {
-    printf("\nTop-Level Menu\n");
+    printf("\nFlight Selection\n");
     printf("1. Flight 102\n");
     printf("2. Flight 311\n");
     printf("3. Flight 444\n");
     printf("4. Flight 519\n");
     printf("0. Quit\n");
-    printf("Enter your choice: ");
+    printf("\nEnter your choice: ");
 }
 
 void generalSeatMenu()
@@ -32,7 +32,13 @@ void generalSeatMenu()
     printf("c. Show an alphabetical list of seats\n");
     printf("d. Assign a customer to a seat\n");
     printf("e. Delete a seat assignment\n");
-    printf("f. Confirm Seat Assignment\n"); // Moved this line to the sub-menu
+    printf("f. Confirm Seat Assignment\n"); 
     printf("g. Return to top-level menu\n");
-    printf("Enter your choice: ");
+    printf("\nEnter your choice: ");
 }
+//
+//void planeAssign()
+//{
+//    printf\n");
+//    printf("\n");
+//}
