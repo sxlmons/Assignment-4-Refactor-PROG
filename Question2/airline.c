@@ -13,9 +13,11 @@
 
 #include "airline.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 // Define flightNumbers in one of the source files
 int flightNumbers[NUM_FLIGHTS] = { 102, 311, 444, 519 };
@@ -70,11 +72,6 @@ void initializeSeats(PLANE* plane, int flightNumber)
     // Set the selectedFlight for the plane
     plane->selectedFlight = flightNumber;
 }
-
-
-
-
-
 // Helper function to compare seat nodes based on last names for sorting
 int compareSeatNodes(const void* a, const void* b)
 {
@@ -147,21 +144,43 @@ void assignCustomerToSeat(PLANE* plane)
     char lastName[MAX_NAME_LENGTH];
     int seatID;
     int confirmedFlightNumber;
+    char userConfirmation;
+
+    SEATNODE* current = plane->seats.head; 
 
     // Prompt user for flight number confirmation
     printf("Confirm Flight Number (102, 311, 444, 519): ");
-    scanf_s("%d", &confirmedFlightNumber);
-    clearInputBuffer(); // Clear input buffer to handle newline
+    scanf_s("%d", &confirmedFlightNumber);  
+
+    if (&confirmedFlightNumber != plane->selectedFlight)    
+    {
+        printf("\nNOTICE: you are selecting seating for flight %d\n", plane->selectedFlight);
+        printf("Is this correct? [y/n]: ");
+        while (scanf_s("%c", &userConfirmation, 1) != isalpha) 
+        {
+            scanf_s("%c", &userConfirmation, 1); 
+            if (userConfirmation = 'y') 
+            {
+                continue;
+            }
+            else (userConfirmation = 'n'); 
+            {
+                break;
+            }
+        } 
+    }
+
+    clearInputBuffer(); // Clear input buffer to handle newline  
 
     // Determine the correct plane number based on the confirmed flight number
-    int planeNumber;
-    if (confirmedFlightNumber == 102 || confirmedFlightNumber == 444)
+    int planeNumber;  
+    if (confirmedFlightNumber == 102 || confirmedFlightNumber == 444)  
     {
-        planeNumber = 1;
+        planeNumber = 1; 
     }
-    else if (confirmedFlightNumber == 311 || confirmedFlightNumber == 519)
+    else if (confirmedFlightNumber == 311 || confirmedFlightNumber == 519)  
     {
-        planeNumber = 2;
+        planeNumber = 2; 
     }
     else
     {
@@ -179,13 +198,7 @@ void assignCustomerToSeat(PLANE* plane)
         printf("Invalid seat ID.\n");
         return;
     }
-
-    // Add these print statements for debugging
-    printf("Confirmed Flight Number: %d\n", confirmedFlightNumber);
-    printf("Selected Flight Number: %d\n", plane->selectedFlight);
-
-    SEATNODE* current = plane->seats.head;
-
+    
     // Find the selected seat in the plane's seat list
     while (current != NULL && current->seatID != seatID)
     {
@@ -208,19 +221,13 @@ void assignCustomerToSeat(PLANE* plane)
         lastName[MAX_NAME_LENGTH - 1] = '\0';
         strncpy(current->lastName, lastName, MAX_NAME_LENGTH - 1);
 
-        printf("Seat successfully assigned!\n");
+        printf("\nSeat successfully assigned!\n");
     }
     else
     {
         printf("Invalid seat ID or seat already assigned.\n");
     }
 }
-
-
-
-
-
-
 
 void deleteSeatAssignment(PLANE* plane)
 {
@@ -273,21 +280,21 @@ void deleteSeatAssignment(PLANE* plane)
 }
 
 
-void show_empty_seats_by_flight(SEATLIST* seatList, int flightNumber)
+void numberOfEmptySeatsByFlight(PLANE* plane)
 {
     int emptySeatCount = 0;
-    SEATNODE* current = seatList->head;
+    SEATNODE* current = plane->seats.head;    
 
     while (current != NULL)
     {
-        if (!current->assigned && current->flightNumber == flightNumber)
+        if (!current->assigned && plane->selectedFlight) 
         {
             emptySeatCount++;
         }
         current = current->next;
     }
 
-    printf("Number of empty seats for Flight #%d: %d\n", flightNumber, emptySeatCount);
+    printf("Number of empty seats for Flight #%d: %d\n", plane->selectedFlight, emptySeatCount); 
 }
 
 

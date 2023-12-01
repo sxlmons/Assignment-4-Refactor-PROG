@@ -59,17 +59,17 @@ o Documentation: 4.0/4.0
 #include "menu.h"
 #include "airline.h"
 
-
+    
 
 int main(void) {
-    // Initialize the seats array for both planes
-    initializeSeats(&Planes[0], flightNumbers[0]);    
-    initializeSeats(&Planes[1], flightNumbers[1]);   
+    // Initialize the seats array for both planes for their flights
+    initializeSeats(&Planes[0], flightNumbers[0, 2]);
+    initializeSeats(&Planes[1], flightNumbers[1, 3]);
 
     // Variable to store the user's menu choice
     char choice;
     int planeNumber;
-    int flightNumber;
+    int flightNumber; 
 
     // Main loop of the program
     do {
@@ -83,7 +83,7 @@ int main(void) {
         switch (choice) {
         case '1':
             planeNumber = 1;
-            flightNumber = flightNumbers[0];
+            flightNumber = flightNumbers[0]; 
             break;
         case '2':
             planeNumber = 2;
@@ -95,7 +95,7 @@ int main(void) {
             break;
         case '4':
             planeNumber = 2; // Assuming you want to use the same planes for multiple flights
-            flightNumber = flightNumbers[3];
+            flightNumber = flightNumbers[3]; 
             break;
         case '0':
             printf("Exiting the program. Goodbye!\n");
@@ -109,41 +109,32 @@ int main(void) {
 
         // Sub-menu loop for the chosen flight
         do {
-            // Print sub-menu heading for the chosen flight
             printf("\nFlight %d Menu\n", flightNumber);
             generalSeatMenu();
 
-            // Get user's choice for the chosen flight
             scanf_s(" %c", &choice, 1);
             (void)getchar(); // eat newline 
 
             switch (choice) {
             case 'a':
-                // Show the number of empty seats for the chosen flight
-                showEmptySeatsByFlight(&Planes[planeNumber - 1]);
+                numberOfEmptySeatsByFlight(&Planes[planeNumber - 1]);
                 break;
             case 'b':
-                // Show a list of empty seats for the chosen flight
-                //showListofEmptySeats(&Planes[planeNumber - 1]); 
+                showEmptySeatsByFlight(&Planes[planeNumber - 1]); 
                 break;
             case 'c':
-                // Show an alphabetical list of seats for the chosen flight
                 showAlphabeticalListOfSeats(&Planes[planeNumber - 1]);
                 break;
             case 'd':
-                // Assign a customer to a seat for the chosen flight
-                assignCustomerToSeat(&Planes[planeNumber - 1]);
+                assignCustomerToSeat(&Planes[planeNumber - 1]);  
                 break;
             case 'e':
-                // Delete a seat assignment for the chosen flight
                 deleteSeatAssignment(&Planes[planeNumber - 1]);
                 break;
             case 'f':
-                // Confirm seat assignment for the chosen flight
                 confirmSeatAssignment(&Planes[planeNumber - 1]);
                 break;
             case 'g':
-                // Return to the top-level menu
                 printf("Returning to the top-level menu.\n");
                 break;
             default:

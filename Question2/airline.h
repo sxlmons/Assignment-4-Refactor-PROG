@@ -48,11 +48,13 @@ extern int flightNumbers[NUM_FLIGHTS];
 // Function prototypes
 void initializeSeats(PLANE* plane, int flightNumber);  
 
+void numberOfEmptySeatsByFlight(PLANE* plane); 
+
 void showEmptySeatsByFlight(PLANE* plane);
 
 void deleteSeatAssignment(PLANE* plane);  // Modified prototype
 
-void assignCustomerToSeat(PLANE* plane);  // Modified prototype
+void assignCustomerToSeat(PLANE* plane);  // Modified prototype 
 
 void showAlphabeticalListOfSeats(PLANE* plane);  // Modified prototype
 
