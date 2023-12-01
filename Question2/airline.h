@@ -43,19 +43,21 @@ typedef struct Plane {
 extern PLANE Planes[NUM_PLANES];
 
 // Flight numbers
-extern int flightNumbers[NUM_FLIGHTS]; 
+extern int flightNumbers[NUM_FLIGHTS];
 
 // Function prototypes
-void initializeSeats(SEATLIST* seatList, int flightNumber);  
+void initializeSeats(PLANE* plane, int flightNumber);  
 
-void show_empty_seats_by_flight(SEATLIST* seatList, int flightNumber);
+void showEmptySeatsByFlight(PLANE* plane);
 
-void delete_seat_assignment(SEATLIST* seatList);
+void deleteSeatAssignment(PLANE* plane);  // Modified prototype
 
-void assign_customer_to_seat(SEATLIST* seatList);  
+void assignCustomerToSeat(PLANE* plane);  // Modified prototype
 
-void show_alphabetical_list_of_seats(SEATLIST* seatList);
+void showAlphabeticalListOfSeats(PLANE* plane);  // Modified prototype
 
-void confirm_seat_assignment(SEATLIST* seatList, int flightNumber);   
+void confirmSeatAssignment(PLANE* plane);  // Modified prototype
 
-void clearInputBuffer(); 
+void clearInputBuffer();
+
+bool isValidFlightNumber(int flightNumber);  

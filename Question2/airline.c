@@ -24,72 +24,72 @@ int flightNumbers[NUM_FLIGHTS] = { 102, 311, 444, 519 };
 PLANE Planes[NUM_PLANES];
 
 
-void initializeSeats(SEATLIST* seatList, int flightNumber) 
+void initializeSeats(PLANE* plane, int flightNumber)
 {
-    // Initialize the linked list as empty
-    seatList->head = NULL;
+    plane->seats.head = NULL;
     SEATNODE* current = NULL;
 
-    for (int i = 0; i < 12; ++i) 
+    for (int i = 0; i < 12; ++i)
     {
-        // Create a new seat node
         SEATNODE* newSeat = (SEATNODE*)malloc(sizeof(SEATNODE));
-        if (newSeat == NULL) 
+        if (newSeat == NULL)
         {
             // Handle memory allocation failure
             fprintf(stderr, "Memory allocation error\n");
-
-            // Free previously allocated nodes
-            while (seatList->head != NULL) {
-                current = seatList->head;
-                seatList->head = current->next;
+            while (plane->seats.head != NULL)
+            {
+                current = plane->seats.head;
+                plane->seats.head = current->next;
                 free(current);
             }
-
             exit(EXIT_FAILURE);
         }
 
         newSeat->seatID = i + 1;
-        newSeat->flightNumber = flightNumber;  // Set the flightNumber
+        newSeat->flightNumber = flightNumber;
         newSeat->assigned = false;
-
-        // Empty string for unassigned seats
         newSeat->firstName[0] = '\0';
         newSeat->lastName[0] = '\0';
         newSeat->next = NULL;
 
-        // Add the new seat to the linked list
-        if (seatList->head == NULL) 
+        if (plane->seats.head == NULL)
         {
-            seatList->head = newSeat;
+            plane->seats.head = newSeat;
         }
-        else 
+        else
         {
-            SEATNODE* current = seatList->head;
-            while (current->next != NULL) 
+            current = plane->seats.head;
+            while (current->next != NULL)
             {
                 current = current->next;
             }
             current->next = newSeat;
         }
     }
+
+    // Set the selectedFlight for the plane
+    plane->selectedFlight = flightNumber;
 }
 
 
+
+
+
 // Helper function to compare seat nodes based on last names for sorting
-int compareSeatNodes(const void* a, const void* b) 
+int compareSeatNodes(const void* a, const void* b)
 {
     const SEATNODE* seatA = *(const SEATNODE**)a;
     const SEATNODE* seatB = *(const SEATNODE**)b;
     return strcmp(seatA->lastName, seatB->lastName);
 }
 
-void show_alphabetical_list_of_seats(SEATLIST* seatList) 
+void showAlphabeticalListOfSeats(PLANE* plane)
 {
+    SEATNODE* current = plane->seats.head;
+
     // Count the number of seats in the list
     int seatCount = 0;
-    SEATNODE* current = seatList->head;
-    while (current != NULL) 
+    while (current != NULL)
     {
         seatCount++;
         current = current->next;
@@ -97,15 +97,15 @@ void show_alphabetical_list_of_seats(SEATLIST* seatList)
 
     // Create an array of pointers to seat nodes
     SEATNODE** seatArray = malloc(seatCount * sizeof(SEATNODE*));
-    if (seatArray == NULL) 
+    if (seatArray == NULL)
     {
         fprintf(stderr, "Memory allocation error\n");
         return;
     }
 
     // Fill the array with seat nodes
-    current = seatList->head;
-    for (int i = 0; i < seatCount; i++) 
+    current = plane->seats.head;
+    for (int i = 0; i < seatCount; i++)
     {
         seatArray[i] = current;
         current = current->next;
@@ -115,9 +115,10 @@ void show_alphabetical_list_of_seats(SEATLIST* seatList)
     qsort(seatArray, seatCount, sizeof(SEATNODE*), compareSeatNodes);
 
     // Print the sorted list
-    for (int i = 0; i < seatCount; i++) 
+    printf("Alphabetical List of Seats for Flight %d:\n", plane->selectedFlight);
+    for (int i = 0; i < seatCount; i++)
     {
-        printf("Seat ID: %d, Assigned: %s, Last Name: %s, First Name: %s\n",
+        printf("Seat ID: %2d, Assigned: %s, Last Name: %s, First Name: %s\n",
             seatArray[i]->seatID,
             seatArray[i]->assigned ? "Yes" : "No",
             seatArray[i]->lastName,
@@ -128,128 +129,149 @@ void show_alphabetical_list_of_seats(SEATLIST* seatList)
     free(seatArray);
 }
 
-void assign_customer_to_seat(SEATLIST* seatList) 
+bool isValidFlightNumber(int flightNumber)
+{
+    for (int i = 0; i < NUM_FLIGHTS; ++i)
+    {
+        if (flightNumber == flightNumbers[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void assignCustomerToSeat(PLANE* plane)
 {
     char firstName[MAX_NAME_LENGTH];
     char lastName[MAX_NAME_LENGTH];
     int seatID;
-    int flightNumber;
+    int confirmedFlightNumber;
 
-    printf("Enter flight number (102, 311, 444, 519): ");
-    scanf_s("%d", &flightNumber);
-    getchar(); // eat newline
+    // Prompt user for flight number confirmation
+    printf("Confirm Flight Number (102, 311, 444, 519): ");
+    scanf_s("%d", &confirmedFlightNumber);
+    clearInputBuffer(); // Clear input buffer to handle newline
 
+    // Determine the correct plane number based on the confirmed flight number
     int planeNumber;
-    if (flightNumber == 102 || flightNumber == 444) {
+    if (confirmedFlightNumber == 102 || confirmedFlightNumber == 444)
+    {
         planeNumber = 1;
     }
-    else if (flightNumber == 311 || flightNumber == 519) {
+    else if (confirmedFlightNumber == 311 || confirmedFlightNumber == 519)
+    {
         planeNumber = 2;
     }
-    else {
+    else
+    {
         printf("Invalid flight number.\n");
         return;
     }
 
-    PLANE* plane = &Planes[planeNumber - 1]; // Adjust the index 
-    SEATNODE* current = plane->seats.head;
-
+    // Prompt user for seat ID to assign
     printf("Enter seat ID to assign (1-12): ");
     scanf_s("%d", &seatID);
-    getchar(); // eat newline
+    clearInputBuffer(); // Clear input buffer to handle newline
 
-    if (seatID >= 1 && seatID <= 12) {
+    if (seatID < 1 || seatID > 12)
+    {
+        printf("Invalid seat ID.\n");
+        return;
+    }
+
+    // Add these print statements for debugging
+    printf("Confirmed Flight Number: %d\n", confirmedFlightNumber);
+    printf("Selected Flight Number: %d\n", plane->selectedFlight);
+
+    SEATNODE* current = plane->seats.head;
+
+    // Find the selected seat in the plane's seat list
+    while (current != NULL && current->seatID != seatID)
+    {
+        current = current->next;
+    }
+
+    if (current != NULL && !current->assigned)
+    {
         // Prompt user for passenger's first and last names
         printf("Enter passenger first name: ");
         scanf_s("%s", firstName, MAX_NAME_LENGTH);
         printf("Enter passenger last name: ");
         scanf_s("%s", lastName, MAX_NAME_LENGTH);
 
-        while (current != NULL && current->seatID != seatID) {
-            current = current->next;
-        }
+        // Assign seat details
+        current->assigned = true;
+        firstName[MAX_NAME_LENGTH - 1] = '\0';
+        strncpy(current->firstName, firstName, MAX_NAME_LENGTH - 1);
 
-        if (current != NULL && !current->assigned) {
-            current->assigned = true;
-            firstName[sizeof(firstName) - 1] = '\0';
-            strncpy(current->firstName, firstName, sizeof(current->firstName) - 1);           
+        lastName[MAX_NAME_LENGTH - 1] = '\0';
+        strncpy(current->lastName, lastName, MAX_NAME_LENGTH - 1);
 
-            lastName[sizeof(lastName) - 1] = '\0';
-            strncpy(current->lastName, lastName, sizeof(current->lastName) - 1);
-
-            printf("Seat successfully assigned!\n");
-        }
-        else {
-            printf("Invalid seat ID or seat already assigned.\n");
-        }
+        printf("Seat successfully assigned!\n");
     }
-    else {
-        printf("Invalid seat ID.\n");
+    else
+    {
+        printf("Invalid seat ID or seat already assigned.\n");
     }
 }
 
-void delete_seat_assignment(SEATLIST* seatList) 
-{   
-    int seatID;              
-    int planeNumber;      
-    int flightNumber;   
 
-    printf("Enter plane number (1 or 2): ");
-    scanf_s("%d", &planeNumber); 
-    getchar(); // eat newline  
 
-    if (planeNumber >= 1 && planeNumber <= NUM_PLANES) 
+
+
+
+
+void deleteSeatAssignment(PLANE* plane)
+{
+    int seatID;
+    int flightNumber;
+
+    printf("Enter flight number (102, 311, 444, 519): ");
+    scanf_s("%d", &flightNumber);
+    (void)getchar(); // eat newline
+
+    // Check if the entered flight number is valid
+    if (flightNumber == 102 || flightNumber == 311 || flightNumber == 444 || flightNumber == 519)
     {
-        PLANE* plane = &Planes[planeNumber - 1]; // Adjust the index
-        SEATNODE* current = plane->seats.head;
+        printf("Enter seat ID to delete assignment (1-12): ");
+        scanf_s("%d", &seatID);
+        (void)getchar(); // eat newline
 
-        // Explicitly ask the user to input the flight number
-        printf("Enter flight number (102, 311, 444, 519): ");
-        scanf_s("%d", &flightNumber);
-        getchar(); // eat newline
-
-        // Check if the entered flight number is valid
-        if (flightNumber == 102 || flightNumber == 311 || flightNumber == 444 || flightNumber == 519) 
+        if (seatID >= 1 && seatID <= 12)
         {
-            printf("Enter seat ID to delete assignment (1-12): ");
-            scanf_s("%d", &seatID);
-            getchar(); // eat newline
+            SEATNODE* current = plane->seats.head;
 
-            if (seatID >= 1 && seatID <= 12) 
+            // Find the selected seat in the plane's seat list
+            while (current != NULL && (current->seatID != seatID || current->flightNumber != flightNumber)) 
             {
-                while (current != NULL && (current->seatID != seatID || current->flightNumber != flightNumber)) 
-                {
-                    current = current->next;
-                }
-
-                if (current != NULL && current->assigned) 
-                {
-                    current->assigned = false;
-                    current->firstName[0] = '\0'; // Clear the first name
-                    current->lastName[0] = '\0';  // Clear the last name
-
-                    printf("Assignment successfully deleted!\n");
-                }
-                else 
-                {
-                    printf("Invalid seat ID, seat not assigned, or mismatched flight number.\n");
-                }
+                current = current->next;
             }
-            else 
+
+            if (current != NULL && current->assigned)
             {
-                printf("Invalid seat ID.\n");
+                current->assigned = false;
+                current->firstName[0] = '\0'; // Clear the first name
+                current->lastName[0] = '\0';  // Clear the last name
+
+                printf("Assignment successfully deleted!\n");
+            }
+            else
+            {
+                printf("Invalid seat ID, seat not assigned, or mismatched flight number.\n");
             }
         }
-        else 
+        else
         {
-            printf("Invalid flight number.\n");
+            printf("Invalid seat ID.\n");
         }
     }
-    else 
+    else
     {
-        printf("Invalid plane number.\n");
+        printf("Invalid flight number.\n");
     }
 }
+
 
 void show_empty_seats_by_flight(SEATLIST* seatList, int flightNumber)
 {
@@ -270,16 +292,16 @@ void show_empty_seats_by_flight(SEATLIST* seatList, int flightNumber)
 
 
 
-void show_list_of_empty_seats(SEATLIST* seatList) 
+void showEmptySeatsByFlight(PLANE* plane)
 {
-    SEATNODE* current = seatList->head;
+    SEATNODE* current = plane->seats.head;
     bool emptyFound = false;
 
-    printf("List of empty seats:\n");
+    printf("List of empty seats for Flight %d:\n", plane->selectedFlight);
 
-    while (current != NULL) 
+    while (current != NULL)
     {
-        if (!current->assigned) 
+        if (!current->assigned)
         {
             printf("Seat ID: %d\n", current->seatID);
             emptyFound = true;
@@ -287,47 +309,61 @@ void show_list_of_empty_seats(SEATLIST* seatList)
         current = current->next;
     }
 
-    if (!emptyFound) 
+    if (!emptyFound)
     {
         printf("No empty seats.\n");
     }
 }
+
 
 void clearInputBuffer() {  
     int c;
     while ((c = getchar()) != '\n' && c != EOF); 
 }
 
-void confirm_seat_assignment(SEATLIST* seatList, int planeNumber) {
+void confirmSeatAssignment(PLANE* plane)
+{
     char firstName[MAX_NAME_LENGTH];
     char lastName[MAX_NAME_LENGTH];
 
     // Prompt user for passenger name
     printf("Enter passenger first name: ");
     scanf_s("%s", firstName, MAX_NAME_LENGTH);
+
     printf("Enter passenger last name: ");
     scanf_s("%s", lastName, MAX_NAME_LENGTH);
 
     // Search for the passenger in the seat list
-    SEATNODE* current = seatList->head;
+    SEATNODE* current = plane->seats.head;
     bool found = false;
 
-    while (current != NULL) {
-        if (current->assigned && strcmp(current->firstName, firstName) == 0 && strcmp(current->lastName, lastName) == 0) {
+    // Ensure null-terminated strings
+    firstName[sizeof(firstName) - 1] = '\0';
+    lastName[sizeof(lastName) - 1] = '\0';
+
+    while (current != NULL)
+    {
+        if (current->assigned && strcmp(current->firstName, firstName) == 0 && strcmp(current->lastName, lastName) == 0)
+        {
             // Passenger found
             printf("Passenger found!\n");
-            printf("Plane: %d, Flight: #%d, Seat ID: %d, Last Name: %s, First Name: %s\n",
-                planeNumber, current->flightNumber, current->seatID, current->lastName, current->firstName);
+
+            // Display flight number from the selected plane
+            printf("Flight: #%d, Seat ID: %d, Last Name: %s, First Name: %s\n",
+                plane->selectedFlight, current->seatID, current->lastName, current->firstName);
             found = true;
             break;
         }
         current = current->next;
     }
 
-    if (!found) {
-        printf("No passengers matching the provided name on Flight #%d.\n", flightNumbers[planeNumber - 1]);
+    if (!found)
+    {
+        printf("No passengers matching the provided name on Flight #%d.\n", plane->selectedFlight);
     }
 }
+
+
 
 
 
