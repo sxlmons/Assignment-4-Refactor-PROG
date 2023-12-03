@@ -1,27 +1,31 @@
-/* 
-  This program manages seating reservations for Colossus Airlines, which has a 
-  single plane with 12 seats.The program uses an array of 12 structures, each
-  representing a seat with its ID, assignment status, and the seat holder's name. 
-  It provides a menu for users to view empty seats, view seats in alphabetical
-  order, assign or delete seat assignments, and quit the program.The program
-  saves data between runs, and upon restart, it populates itself with that data.
- 
+/*
   PROG71985 - F23 - Nov 2023 - Joshua Salmons
- 
-  Assignment #4 - Question #2 - main.c
- 
+
+  Assignment #4 refactor - Question #2 - main.c
+
   Revision History
- 
-		1.0      2023-Nov-10          initial
-		1.1		 2023-Nov-25		  refactor
+
+        1.0      2023 Nov 10          initial
+
+        1.1		 2023 Nov 25		  refactor
+            -> Fixed globally scoped array
+            -> Tried using arrays for things
+            -> Things became a mess
+
+        1.2      2023 Nov 28->Dec 3   refactor2
+            -> Fresh project, built from ground up
+            -> Used LinkedList SEAT->FLIGHT->PLANE
+            -> Learned how to bubble sort LinkedLists
+            -> Overhaul of save/load feature
+            -> LinkedLists are awesome!
 Feedback:
 
  Question 2: Modeling a (single) airline/airplane reservation system
 
-o Specifications: 8.0/8.0 
+o Specifications: 8.0/8.0
 (The program works and meets all of the specifications.)
 
-o Readability+Design: 8.0/8.0 
+o Readability+Design: 8.0/8.0
 (The code is exceptionally well organized and readable due to the use of good variable names, data and function structure.
 The code is designed ‘defensively’ (meaning garbage is kept out). The code allows for both effective testing and extension.)
 
@@ -31,8 +35,18 @@ readability or design concepts taught in the course or the following issues were
  —Having hard coded (magic) values in function limits reusability
  —Globally scoped variables should be avoided unless absolutely required
 
-o Documentation: 4.0/4.0 
+o Documentation: 4.0/4.0
 (The documentation is well written and clearly explains what the code is accomplishing and how.)
+
+ Original Requirements:
+
+ - Single plane with 12 seats
+ - Seat ID, first name, last name, assignment status
+ - Menu for plane
+ - View empty seats, num of empty seats
+ - Alphabetical order of seats
+ - Delete/Assign seats
+ - Save/Load functionality
 
  New Requirements:
 
@@ -45,104 +59,86 @@ o Documentation: 4.0/4.0
  - Option c) includes 'Flight #' in output; option d) checks seat availability before booking.
  - Sub-menu option f) returns to main menu.
  - Flight data saved to disk on program completion, loaded on start.
-
 */
-#define _CRT_SECURE_NO_WARNINGS
-#define INPUT_LENGTH	1
+
+#include "creators.h"
+#include "interface.h"
+#include "data.h"
+#include "sort.h"
+#include "seats.h"
 
 #include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-#include "menu.h"
-#include "airline.h"
+int main(void)
+{
+    //initialize both planes, with two flights each
+    int plane1Flights[] = { 102, 311 };
+    PLANE plane1 = createPlane(1, plane1Flights, 2);
 
-    
+    int plane2Flights[] = { 444, 519 };
+    PLANE plane2 = createPlane(2, plane2Flights, 2);
 
-int main(void) {
-    // Initialize the seats array for both planes for their flights
-    initializeSeats(&Planes[0], flightNumbers[0, 2]);
-    initializeSeats(&Planes[1], flightNumbers[1, 3]);
+    // Load data from file
+    loadData(plane1, "plane1.txt");
+    loadData(plane2, "plane2.txt");
 
-    // Variable to store the user's menu choice
-    char choice;
-    int planeNumber;
-    int flightNumber; 
+    char userChoice;
 
-    // Main loop of the program
+    //initialize flight number to zero
+    int flightNumber = 0;
+
     do {
-        // Print top-level menu
-        airlineFlightMenu();
 
-        // Get user's choice
-        scanf_s(" %c", &choice, 1);
-        (void)getchar(); // eat newline; added void for compiler
+        flightSelectionMenu();
 
-        switch (choice) {
+        if (scanf(" %c", &userChoice) != 1)
+        {
+            printf("Failed to read input.\n");
+        }
+        while (getchar() != '\n');
+
+        switch (userChoice)
+        {
         case '1':
-            planeNumber = 1;
-            flightNumber = flightNumbers[0]; 
+            flightNumber = 102;    
             break;
         case '2':
-            planeNumber = 2;
-            flightNumber = flightNumbers[1];
+            flightNumber = 311;   
             break;
         case '3':
-            planeNumber = 1; // Assuming you want to use the same planes for multiple flights
-            flightNumber = flightNumbers[2];
+            flightNumber = 444;   
             break;
         case '4':
-            planeNumber = 2; // Assuming you want to use the same planes for multiple flights
-            flightNumber = flightNumbers[3]; 
+            flightNumber = 519;     
             break;
         case '0':
-            printf("Exiting the program. Goodbye!\n");
-            return 0;
+            printf("Exiting the program...\n");   
+            break;
         default:
-            printf("Invalid choice. Please try again.\n");
-            continue;
+            printf("Invalid Input, Returning to Menu... \n");
+        }
+        // If a valid flight number is selected, display seat management interface
+        if (userChoice >= '1' && userChoice <= '4')
+        {
+            if (flightNumber == 102 || flightNumber == 311)
+            {
+                SeatManagementInterface(plane1, flightNumber);
+            }
+            else if (flightNumber == 444 || flightNumber == 519)
+            {
+                SeatManagementInterface(plane2, flightNumber);
+            }
         }
 
-        printf("\nYou selected Flight %d.\n", flightNumber);
+    } while (userChoice != '0');
 
-        // Sub-menu loop for the chosen flight
-        do {
-            printf("\nFlight %d Menu\n", flightNumber);
-            generalSeatMenu();
+    // Save data to file
+    saveData(plane1, "plane1.txt");
+    saveData(plane2, "plane2.txt");
 
-            scanf_s(" %c", &choice, 1);
-            (void)getchar(); // eat newline 
-
-            switch (choice) {
-            case 'a':
-                numberOfEmptySeatsByFlight(&Planes[planeNumber - 1]);
-                break;
-            case 'b':
-                showEmptySeatsByFlight(&Planes[planeNumber - 1]); 
-                break;
-            case 'c':
-                showAlphabeticalListOfSeats(&Planes[planeNumber - 1]);
-                break;
-            case 'd':
-                assignCustomerToSeat(&Planes[planeNumber - 1]);  
-                break;
-            case 'e':
-                deleteSeatAssignment(&Planes[planeNumber - 1]);
-                break;
-            case 'f':
-                confirmSeatAssignment(&Planes[planeNumber - 1]);
-                break;
-            case 'g':
-                printf("Returning to the top-level menu.\n");
-                break;
-            default:
-                printf("Invalid choice. Please try again.\n");
-            }
-        } while (choice != 'g'); // Continue the sub-menu loop until the user chooses to return to the top-level menu
-
-    } while (true); // Continue the main loop indefinitely until the user chooses to quit
+    // Free the memory allocated for the planes, flights, and seats
+    freePlane(plane1);
+    freePlane(plane2);
 
     return 0;
 }
