@@ -4,7 +4,7 @@
   Assignment #4 refactor - Question #2 - seats.h
 
   Details
-        ->
+        ->  seat functions
 
   Revision History
 

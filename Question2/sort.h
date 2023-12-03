@@ -4,8 +4,7 @@
   Assignment #4 refactor - Question #2 - sort.h
 
   Details
-        -> initializers of plane, flights, seats
-        -> get flight function
+        -> sort functions
 
   Revision History
 

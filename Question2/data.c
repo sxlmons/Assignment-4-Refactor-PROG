@@ -90,9 +90,9 @@ void loadData(PLANE plane, const char* filename)
         if (fscanf(file, "%d", &isAssigned) != 1)
             break;
 
-        // Ensure strings are null-terminated
-        firstName[MAXNAME - 1] = NULL;
-        lastName[MAXNAME - 1] = NULL;
+        // Ensure strings are null-terminated,compiler complained that i was using NULL so now using '\0'
+        firstName[MAXNAME - 1] = '\0';
+        lastName[MAXNAME - 1] = '\0';
 
         // Get the flight with the read flight ID
         FLIGHT flight = getFlight(plane, flightID);
